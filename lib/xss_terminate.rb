@@ -12,7 +12,8 @@ module XssTerminate
       write_inheritable_attribute(:xss_terminate_options, {
         :except => (options[:except] || []),
         :html5lib_sanitize => (options[:html5lib_sanitize] || []),
-        :sanitize => (options[:sanitize] || [])
+        :sanitize => (options[:sanitize] || []),
+        :options  => (options[:options] || {})
       })
 
       class_inheritable_reader :xss_terminate_options
@@ -41,7 +42,7 @@ module XssTerminate
         elsif xss_terminate_options[:html5lib_sanitize].include?(field)
           self[field] = HTML5libSanitize.new.sanitize_html(value)
         elsif xss_terminate_options[:sanitize].include?(field)
-          self[field] = RailsSanitize.white_list_sanitizer.sanitize(value)
+          self[field] = RailsSanitize.white_list_sanitizer.sanitize(value, xss_terminate_options[:options].clone)
         else
           self[field] = RailsSanitize.full_sanitizer.sanitize(value)
         end

@@ -25,6 +25,15 @@ class XssTerminateTest < Test::Unit::TestCase
     assert_equal "", e.extended
   end
   
+  def test_rails_sanitization_with_options
+    e = Entry.create!(:title     => 'Title',
+                      :body      => '<script>alert("xss in body")</script><strong>Bold</strong><i>Italic</i><p>Paragraph</p>',
+                      :extended  => '<script>alert("xss in extended")</script>',
+                      :person_id => 1)
+    assert_equal '<strong>Bold</strong><i>Italic</i>Paragraph', e.body
+    assert_equal '', e.extended
+  end
+  
   def test_excepting_specified_fields
     p = Person.create!(:name => "<strong>Mallory</strong>")
     
